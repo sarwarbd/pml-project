@@ -136,9 +136,7 @@ dim(training)</code></pre>
 <h2>Data Cleansing</h2>
 <p>The provided data sets contain lot of columes with NA. Hence, at first NA columes are excluded. That reduces number of columes from 160 to 60.</p>
 <pre class="r"><code>training &lt;- training[,colSums(is.na(training))==0]
-dim(training)</code></pre>
-<pre><code>## [1] 19622    60</code></pre>
-<pre class="r"><code>training &lt;- training[,-(1:5)]
+training &lt;- training[,-(1:5)]
 dim(training)</code></pre>
 <pre><code>## [1] 19622    55</code></pre>
 <p>First 5 columns does not contain any necessary information. Hence further excluding those leads to column count 55.</p>
@@ -161,8 +159,7 @@ training.valid &lt;- training[-trainInd,]</code></pre>
 ctrlFnc &lt;- trainControl(method = &quot;cv&quot;, number = 10)
 fit.rpart &lt;- train(classe ~.,data = training.train, method = &quot;rpart&quot;, trControl = ctrlFnc)</code></pre>
 <p>Built model is applied on 20% validation set kept aside from training set which shows 57% accuracy.</p>
-<pre class="r"><code>library(e1071)
-predict.rpart &lt;- predict(fit.rpart,training.valid)
+<pre class="r"><code>predict.rpart &lt;- predict(fit.rpart,training.valid)
 confusionMatrix(predict.rpart, training.valid$classe)</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
@@ -198,7 +195,7 @@ confusionMatrix(predict.rpart, training.valid$classe)</code></pre>
 </div>
 <div id="prediction-using-random-forest" class="section level2">
 <h2>Prediction using Random Forest</h2>
-<p>Next Random Forest algorith is used to see if accuracy increases. This shows increase in accuracy to 99.8%.</p>
+<p>Next Random Forest algorith is used to see if accuracy increases. This shows increase in accuracy to 99.8%. Out of Sample error is .2%</p>
 <pre class="r"><code>library(randomForest)</code></pre>
 <pre><code>## randomForest 4.6-14</code></pre>
 <pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>

@@ -24,7 +24,6 @@ The provided data sets contain lot of columes with NA. Hence, at first NA colume
 
 ```{r cleansing}
 training <- training[,colSums(is.na(training))==0]
-dim(training)
 training <- training[,-(1:5)]
 dim(training)
 ```
@@ -34,6 +33,7 @@ First 5 columns does not contain any necessary information. Hence further exclud
 ## Data Partitioning
 
 In order to cross-validate and check out of sample error from training set, training set is further splitted into training and validation set - 80% kept for training and 20% for validation
+
 
 ```{r partitioning}
 library(caret)
@@ -57,7 +57,6 @@ fit.rpart <- train(classe ~.,data = training.train, method = "rpart", trControl 
 Built model is applied on 20% validation set kept aside from training set which shows 57% accuracy.
 
 ```{r decision tree result}
-library(e1071)
 predict.rpart <- predict(fit.rpart,training.valid)
 confusionMatrix(predict.rpart, training.valid$classe)
 ```
@@ -65,8 +64,7 @@ confusionMatrix(predict.rpart, training.valid$classe)
 
 ## Prediction using Random Forest
 
-Next Random Forest algorith is used to see if accuracy increases. This shows increase in accuracy to 99.8%.
-
+Next Random Forest algorith is used to see if accuracy increases. This shows increase in accuracy to 99.8%. Out of Sample error is .2%
 
 ```{r random forest}
 library(randomForest)
