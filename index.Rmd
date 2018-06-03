@@ -1,0 +1,90 @@
+---
+title: "PML Project"
+author: "Muhammad Sarwar Siddique"
+date: "June 3, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Loading
+
+At the begining of the project, below section is for loading data into variable. All the blanks, spaces and non-usable values are marked to NA while loading.
+
+```{r load data}
+training <- read.csv("pml-training.csv", na.strings = c(""," ","NA","N/A","#DIV/0!"))
+dim(training)
+```
+
+## Data Cleansing
+
+The provided data sets contain lot of columes with NA. Hence, at first NA columes are excluded. That reduces number of columes from 160 to 60. 
+
+```{r cleansing}
+training <- training[,colSums(is.na(training))==0]
+dim(training)
+training <- training[,-(1:5)]
+dim(training)
+```
+
+First 5 columns does not contain any necessary information. Hence further excluding those leads to column count 55.
+
+## Data Partitioning
+
+In order to cross-validate and check out of sample error from training set, training set is further splitted into training and validation set - 80% kept for training and 20% for validation
+
+```{r partitioning}
+library(caret)
+set.seed(1234)
+trainInd <- createDataPartition(training$classe, p=.8,list = FALSE)
+training.train <- training[trainInd,]
+training.valid <- training[-trainInd,]
+```
+
+
+## Prediction using Decision Tree
+
+At first Decision Tree algorithm is used to build prediction model. For cross-validation 10-fold cross validation is used.
+
+```{r decision tree}
+library(e1071)
+ctrlFnc <- trainControl(method = "cv", number = 10)
+fit.rpart <- train(classe ~.,data = training.train, method = "rpart", trControl = ctrlFnc)
+```
+
+Built model is applied on 20% validation set kept aside from training set which shows 57% accuracy.
+
+```{r decision tree result}
+library(e1071)
+predict.rpart <- predict(fit.rpart,training.valid)
+confusionMatrix(predict.rpart, training.valid$classe)
+```
+
+
+## Prediction using Random Forest
+
+Next Random Forest algorith is used to see if accuracy increases. This shows increase in accuracy to 99.8%.
+
+
+```{r random forest}
+library(randomForest)
+fit.rf <- train(classe ~.,data = training.train, method = "rf", trControl = ctrlFnc)
+predict.rf <- predict(fit.rf,training.valid)
+confusionMatrix(predict.rf, training.valid$classe)
+```
+
+## Applying on Test set
+
+Finally Random Forest is applied on test set after necessary data cleansing, same as training set. And thus the project is closed.
+
+```{r predict}
+testing <- read.csv("pml-testing.csv", na.strings = c(""," ","NA","N/A","#DIV/0!"))
+testing <- testing[,colSums(is.na(testing))==0]
+testing <- testing[,-(1:5)]
+dim(testing)
+predict.rf.test <- predict(fit.rf,testing)
+predict.rf.test
+```
+
